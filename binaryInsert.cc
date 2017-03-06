@@ -1,11 +1,14 @@
+/** This is an implementation of a binary insertion sort */
+
 #include <iostream>
 #include <ctime>
 #include <random>
 
 using namespace std;
 
-const int size = 100000;
+const int size = 100000; // Adjusts size of array to sort
 
+/** Just a little helper function for printin the array */
 void print(int *arr){
 	for(int i=0; i<size; i++){
 		cout << arr[i] << ' ';
@@ -14,11 +17,20 @@ void print(int *arr){
 	cout << endl;
 }
 
+/** A little helper function to check if array is sorted 
+  * returns: true if sorted, false otherwise */
 bool check(int *arr){
 	for(int i=0; i<size-1; i++) if(arr[i]>arr[i+1]) return false;
 	return true;
 }
 
+/** First version of binary search
+  * recursive search
+  * param: arr - the array to search
+  * param: lo - low end of search range
+  * param: hi - high end of search range
+  * param: val - value to insert 
+  * reutrns: index to place val */
 /*int search(int *arr, int lo, int hi, int val){
 	if(lo >= hi) return (val>=arr[lo]) ? lo+1 : lo;
 	int mid = (lo>>1) + (hi>>1);
@@ -30,6 +42,12 @@ bool check(int *arr){
 	}
 }*/
 
+/** First version of binary search
+  * loop search
+  * param: arr - the array to search
+  * param: lo - low end of search range
+  * param: hi - high end of search range
+  * param: val - value to insert */
 int search(int *arr, int lo, int hi, int val){
 	for(int i=hi>>1; lo<hi; i=(lo>>1)+(hi>>1)){
 		if(val > arr[i]) lo = i+1;
@@ -42,6 +60,8 @@ int search(int *arr, int lo, int hi, int val){
 	return (val >= arr[lo]) ? lo+1 : lo;
 }
 
+/** Binary insertion sort
+  * param: arr - the array to sort */
 void binSort(int *arr){
 	for(int i=1, ins, temp; i<size; ++i){
 		if(arr[i] < arr[i-1]){
@@ -53,6 +73,7 @@ void binSort(int *arr){
 	}
 }
 
+/** Just an ordinary insertion sort for comparison */
 void insSort(int *arr){
 	for(int i=1, ins=0, temp=0; i<size; ++i){
 		if(arr[i] >= arr[i-1]) continue;
