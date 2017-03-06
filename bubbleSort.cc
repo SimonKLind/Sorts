@@ -1,3 +1,5 @@
+/** Gotta have bubble sort right? */
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -6,6 +8,8 @@
 
 using namespace std;
 
+/** Bubble sort
+  * param: arr - the array to sort */
 void sort(int* arr){
 	for(bool check=1; check==1;){
 		check=0;
