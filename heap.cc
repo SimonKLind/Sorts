@@ -1,16 +1,22 @@
+/** This is an implementation of heap sort */
+
 #include <iostream>
 #include <random>
 #include <ctime>
 
 using namespace std;
 
-const int length = 100000000;
+const int length = 100000000; // Adjusts size of array to sort
 
+/** Just a helper function to check if array is sorted
+  * param: arr - array to check
+  * returns: true if sorted, otherwise false */
 bool check(int *arr){
 	for(int i=0; i<length-1; i++) if(arr[i]>arr[i+1]) return false;
 	return true;
 }
 
+/** Just a helper function to print array */
 void print(int *arr){
 	for(int i=0; i<length; i++){
 		cout << arr[i] << ' ';
@@ -19,12 +25,20 @@ void print(int *arr){
 	cout << endl;
 }
 
+/** Swaps two elements in an array
+  * param: arr - array to perform swap on
+  * param: a - index to swap
+  * param: b - other index to swap */
 void swap(int *arr, int a, int b){
 	int temp = arr[a];
 	arr[a] = arr[b];
 	arr[b] = temp;
 }
 
+/** Sinsk an element in the heap
+  * param: arr - heap array
+  * param: i - index in heap (starting from 1)
+  * param: n - length of heap */
 void sink(int *arr, int i, int n){
 	int swapIndex;
 	while(2*i<=n){
@@ -36,6 +50,8 @@ void sink(int *arr, int i, int n){
 	}
 }
 
+/** Turns array into max-heap and then sorts 
+  * param: arr - array to sort */
 void sort(int *arr){
 	int n=length;
 	for(int i=(int)(length/2); i>0; i--) sink(arr, i, n);
