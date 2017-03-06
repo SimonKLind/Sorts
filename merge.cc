@@ -1,11 +1,17 @@
+/** This is an implementation of merge sort.
+  * It will default to a binary insetion sort 
+  * when the active array is short enough */
+
 #include <iostream>
 #include <ctime>
 #include <random>
 
 using namespace std;
 
-const int size = 100000000;
+const int size = 100000000; // Adjust size of array to sort
 
+/** Just a helper function to print array
+  * param: arr - array to print */
 void print(int *arr){
 	for(int i=0; i<size; i++){
 		cout << arr[i] << ' ';
@@ -14,11 +20,15 @@ void print(int *arr){
 	cout << endl;
 }
 
+/** Just a helper function to check if array is sorted
+  * param: arr - array to check
+  * returns: true if sorted, otherwise false */
 bool check(int *arr){
 	for(int i=0; i<size-1; i++) if(arr[i]>arr[i+1]) return false;
 	return true;
 }
 
+/** Loop version of binary search */
 int search(int *arr, int lo, int hi, int val){
 	for(int i=hi>>1; lo<hi; i=(lo>>1)+(hi>>1)){
 		if(val > arr[i]) lo = i+1;
@@ -31,6 +41,7 @@ int search(int *arr, int lo, int hi, int val){
 	return (val >= arr[lo]) ? lo+1 : lo;
 }
 
+/** Binary insertion sort, same as in the separate file */
 void binSort(int *arr, int len){
 	for(int i=1, ins, temp; i<len; ++i){
 		if(arr[i] < arr[i-1]){
@@ -42,6 +53,10 @@ void binSort(int *arr, int len){
 	}
 }
 
+/** Sorts using heap sort
+  * defaults to binary insetion sort when length is <= 32
+  * param: arr - array to sort
+  * param: len - length of array */
 void sort(int *arr, int len){
 	if(len <= 32) binSort(arr, len);
 	else{
