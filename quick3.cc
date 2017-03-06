@@ -1,11 +1,20 @@
+/** This is an implementation of quick3 sort.
+  * Quick3 uses 3 partitions:
+  * One for elements less than pivot
+  * One for elements equal to pivot
+  * One for elements larger than pivot
+  * This is to more efficiently handle cases where
+  * there are many duplicates */
+
 #include <iostream>
 #include <random>
 #include <ctime>
 
 using namespace std;
 
-const int length = 1000000;
+const int length = 1000000; // Adjust size of array to sort
 
+/** Just a helper function to print array */
 void print(int *arr){
 	for(int i=0; i<length; i++){
 		cout << arr[i] << ' ';
@@ -14,12 +23,20 @@ void print(int *arr){
 	cout << endl;
 }
 
+/** Swaps to elements in array
+ * param: arr - array to per form swap on
+ * param: a - index to swap
+ * param: b - other index to swap */
 void swap(int *arr, int a, int b){
 	int temp = arr[a];
 	arr[a]=arr[b];
 	arr[b]=temp;
 }
 
+/** Sorts using quick3
+  * param: arr - array to sort
+  * param: lo - low end of active range
+  * param: hi - high end of active range */
 void sort(int *arr, int lo, int hi){
 	int OH = hi;
 	int OL = lo;
@@ -36,35 +53,9 @@ void sort(int *arr, int lo, int hi){
 	if(OH > ++hi) sort(arr, hi, OH);
 }
 
-void pSwap(int *a, int *b){
-	int temp = *a;
-	*a = *b;
-	*b = temp;
-}
-
-void pSort(int *lo, int *hi){
-	int *OH = hi;
-	int *OL = lo;
-	int *pivot = lo++;
-	while(lo<=hi){
-		if(*pivot>*lo) pSwap(pivot++, lo++);
-		else if(*pivot<*lo){
-			while(*hi>*lo) hi--;
-			pSwap(lo, hi--);
-		}
-		else if(*pivot==*lo) lo++;
-	}
-	if(OL < --pivot) pSort(OL, pivot);
-	if(OH > ++hi) pSort(hi, OH);
-}
-
+/** Just a helper function to check if array is sorted */
 bool check(int *arr){
 	for(int i=0; i<length-1; i++) if(arr[i]>arr[i+1]) return false;
-	return true;
-}
-
-bool equal(int *a, int *b){
-	for(int i=0; i<length; i++) if(a[i]!=b[i]) return false;
 	return true;
 }
 
