@@ -1,3 +1,5 @@
+/** This is an implementation of radix sort */
+
 #include <iostream>
 #include <random>
 #include <ctime>
@@ -7,11 +9,13 @@ using namespace std;
 
 const int length = 100000000;
 
+/** Just a helper function to check if array is sorted */
 bool check(int *arr){
 	for(int i=0; i<length-1; i++) if(arr[i]>arr[i+1]) return false;
 	return true;
 }
 
+/** Just a helper function to print array */
 void print(int *arr){
 	for(int i=0; i<length; i++){
 		cout << arr[i] << ' ';
@@ -20,6 +24,8 @@ void print(int *arr){
 	cout << endl;
 }
 
+/** A basic bucket class designed to be fast
+  * especially with radix sort */
 class bucket{
 	int allocated;
 public:
@@ -55,6 +61,8 @@ public:
 	}
 };
 
+/** Sorts array using radix sort
+  * param: arr - array to sort */
 void sort(int *arr){
 	int div=1, largest=0, divMax=0, it[10], x;
 	bucket b[10];
