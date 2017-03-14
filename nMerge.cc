@@ -1,11 +1,20 @@
+/** This is an improved implementation of merge sort.
+  * This merges with only one half in temporary memory
+  * which decreases data movement a bit, and improves 
+  * space complexity to the standard O(n) of merge sort. 
+  * It also uses minrun as in Timsort to determine a
+  * good length limit for defaulting to binary insertion sort */
+
 #include <iostream>
 #include <random>
 #include <ctime>
 
 using namespace std;
 
-const int size = 100000000;
+const int size = 100000000; // Size of array to sort
 
+/** Just a little helper function
+  * Checks if contents of two differently ordered arrays are equal */
 int equals(int *a, int *b){
 	int *aCount = new int[size];
 	int *bCount = new int[size];
@@ -24,6 +33,7 @@ int equals(int *a, int *b){
 	return same;
 }
 
+/** Prints array */
 void print(int *arr){
 	for(int i=0; i<size; i++){
 		cout << arr[i] << ' ';
@@ -32,6 +42,7 @@ void print(int *arr){
 	cout << endl;
 }
 
+/** Checks if array is sorted */
 bool check(int *arr){
 	for(int i=0; i<size-1; i++) if(arr[i]>arr[i+1]) return false;
 	return true;
@@ -62,6 +73,8 @@ void binSort(int *arr, int lo, int hi){
 	}
 }
 
+/** Calculates appropriate minrun length
+  * as described by Tim Peters in his description of Timsort */
 int calcMinRun(int len){
 	char r = 0;
 	while(len > 64){
@@ -71,20 +84,19 @@ int calcMinRun(int len){
 	return len+r;
 }
 
+/** Main sort 
+  * divides and merges 
+  * sorts with binSort if length < minrun */
 void sort(int *arr, int lo, int hi, int minrun){
-	// cout << hi-lo+1 << ", " << minrun << endl;
-	/*if(hi-lo+1 <= minrun) binSort(arr, lo, hi);
-	else{*/
-		int mid = (lo>>1)+(hi>>1), midLen = mid-lo+1;
-		(midLen <= minrun) ? binSort(arr, lo, mid) : sort(arr, lo, mid, minrun);
-		(hi-mid <= minrun) ? binSort(arr, mid+1, hi) : sort(arr, mid+1, hi, minrun);
-		int *temp = new int[midLen];
-		for(int i=0; i<midLen; ++i) temp[i] = arr[lo+i];
-		int i=lo, j=0, k=mid+1;
-		while(j<midLen && k<=hi) arr[i++] = (temp[j]<=arr[k]) ? temp[j++] : arr[k++];
-		while(j<midLen) arr[i++] = temp[j++];
-		delete[] temp;
-	// }
+	int mid = (lo>>1)+(hi>>1), midLen = mid-lo+1;
+	(midLen <= minrun) ? binSort(arr, lo, mid) : sort(arr, lo, mid, minrun);
+	(hi-mid <= minrun) ? binSort(arr, mid+1, hi) : sort(arr, mid+1, hi, minrun);
+	int *temp = new int[midLen];
+	for(int i=0; i<midLen; ++i) temp[i] = arr[lo+i];
+	int i=lo, j=0, k=mid+1;
+	while(j<midLen && k<=hi) arr[i++] = (temp[j]<=arr[k]) ? temp[j++] : arr[k++];
+	while(j<midLen) arr[i++] = temp[j++];
+	delete[] temp;
 }
 
 int main(){
