@@ -1,16 +1,32 @@
+/** This is my take on a simpler variation of Timsort
+  * it has most of the functionality of Timsort.
+  * It counts runs and boosts them to at least minrun
+  * and adds them to a merge stack that keeps track of 
+  * when it's appropriate to merge.
+  *
+  * It does however not include the fancy merging features of Timsort,
+  * i.e galloping, and the process of minimizing memory usage are not
+  * implemented here. Mostly because i feel like a few extra bytes of 
+  * memory might not be worth it, and because it feels like a lot of 
+  * processing overhead in order to gain a little on partially sorted data. 
+  * Might add this stuff in the future though. */
+
 #include <iostream>
 #include <ctime>
 #include <random>
 
 using namespace std;
 
-const int SIZE = 100000000;
+const int SIZE = 100000000; // Size of array to sort
 
+/** Just a struct to make run management less of a pain */
 struct Run{
 	int start;
 	int length;
 };
 
+/** Just a helper function used for debugging
+  * Checks if contents in two differently ordered arrays are the same */
 int equals(int *a, int *b){
 	int *aCount = new int[SIZE];
 	int *bCount = new int[SIZE];
@@ -29,6 +45,7 @@ int equals(int *a, int *b){
 	return same;
 }
 
+/** Just a little helper function for printing array */
 void print(int *arr){
 	for(int i=0; i<SIZE; i++){
 		cout << arr[i] << ' ';
@@ -37,14 +54,17 @@ void print(int *arr){
 	cout << endl;
 }
 
+/** Just a little helper function to check if array is sorted */
 bool check(int *arr){
 	for(int i=0; i<SIZE-1; i++) if(arr[i]>arr[i+1]) return false;
 	return true;
 }
 
+/** The merge stack as described in Tim's description 
+  * Manages runs and merges when appropriate */
 class MergeStack{
-	int *arr;
-	Run *runs;
+	int *arr; // The array being sorted
+	Run *runs; // Current array of runs
 	int capacity = 16;
 	int size = 0;
 	void expand(){
@@ -54,16 +74,14 @@ class MergeStack{
 		for(int i=0; i<size; ++i) runs[i] = old[i];
 		delete[] old;
 	}
+	
+	/** Merges two runs, index a and index b */
 	void merge(int a, int b){
-		// print(arr);
-		// cout << "Merging:\n" << runs[a].start << ", " << runs[a].start+runs[a].length-1 << '\n' 
-		// 		<< runs[b].start << ", " << runs[b].start+runs[b].length-1 << '\n';
 		int *temp = new int[runs[a].length];
 		for(int i=0; i<runs[a].length; ++i) temp[i] = arr[runs[a].start+i];
 		int i=runs[a].start, j=0, k=runs[b].start;
 		while(j<runs[a].length && k<runs[b].start+runs[b].length) arr[i++] = (temp[j]<=arr[k]) ? temp[j++] : arr[k++];
 		while(j<runs[a].length) arr[i++] = temp[j++];
-		// cout << "Deleting temp\n";
 		delete[] temp;
 		runs[a].length += runs[b].length;
 		while(b<size-1) runs[b] = runs[++b];
@@ -73,6 +91,9 @@ public:
 	MergeStack(int *array): arr(array){
 		runs = new Run[16];
 	}
+	
+	/** Adds a run to stack 
+	  * Checks to see if runs should be merged, as described by Tim */
 	void add(Run r){
 		runs[size++] = r;
 		while(size >= 3 && runs[size-3].length <= runs[size-2].length + runs[size-1].length || 
@@ -81,6 +102,8 @@ public:
 		}
 		if(size >= capacity) expand();
 	}
+	
+	/** Cleans up to make sure everything is merged */
 	void mergeAll(){
 		while(size>1) merge(size-2, size-1);
 	}
@@ -89,7 +112,7 @@ public:
 	}
 };
 
-/** Search function for the binary sort and insert_lo */
+/** Search function for the binary sort */
 int search(int *arr, int lo, int hi, int val){
 	for(int i=(lo>>1)+(hi>>1); lo<hi; i=(lo>>1)+(hi>>1)){
 		if(val > arr[i]) lo = i+1;
@@ -114,6 +137,7 @@ void binSort(int *arr, int lo, int start, int hi){
 	}
 }
 
+/** Calculates minrun, excactly as described by Tim */
 int calcMinRun(int len){
 	char r = 0;
 	while(len > 64){
@@ -123,6 +147,7 @@ int calcMinRun(int len){
 	return len+r;
 }
 
+/** Reverses section lo -> hi of array */
 void reverse(int *arr, int lo, int hi){
 	int temp;
 	while(lo<hi){
@@ -132,6 +157,7 @@ void reverse(int *arr, int lo, int hi){
 	}
 }
 
+/** Counts run length at current position, reverses if descending */
 int run_length(int *arr, int pos, int len){
 	int i = pos+1;
 	bool ascending = arr[i] >= arr[pos];
@@ -140,26 +166,25 @@ int run_length(int *arr, int pos, int len){
 	return i-pos;
 }
 
+/** Main sort loop */
 void sort(int *arr, int len){
 	int minRun = calcMinRun(len);
 	int pos = 0, runLen, hi;
 	Run current;
 	MergeStack stack(arr);
 	while(pos<len){
-		runLen = run_length(arr, pos, len);
-		if(runLen < minRun){
+		runLen = run_length(arr, pos, len); // Get run length
+		if(runLen < minRun){ // If run length < minrun, boost to minrun (or end of array)
 			hi = (pos+minRun<=len) ? pos+minRun : len; 
-			// cout << runLen << " " << hi << '\n';
 			binSort(arr, pos, pos+runLen, hi);
 			runLen = hi-pos;
 		}
 		current.start = pos;
 		current.length = runLen;
-		// cout << "Adding: " << current.start << " -> " << current.start+current.length-1 << '\n';
-		stack.add(current);
+		stack.add(current); // add run to stack
 		pos+=runLen;
 	}
-	stack.mergeAll();
+	stack.mergeAll(); // Clean up stack
 }
 
 int main(){
