@@ -8,3 +8,5 @@ Implementations include:
  - Merge sort
  - Quick3 sort
  - Radix sort
+ - My slightly simpler take on Timsort
+ - A better merge sort
